@@ -1,0 +1,46 @@
+name: CD
+on:
+  pull_request:
+    branches: ["main"]   
+  push:
+    branches: ["main"]   
+permissions:
+  contents: write
+
+jobs:
+  build-artifact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package app
+        shell: bash
+        run: |
+          if [ -f app.py ]; then
+            tar -czf release.tgz app.py README.md
+          else
+            tar -czf release.tgz README.md
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: release.tgz
+
+  release:
+    if: github.event_name == 'push'   
+    needs: build-artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release
+      - name: Set tag
+        run: echo "TAG=v${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          name: Release ${{ env.TAG }}
+          body: "Auto release from main"
+          files: release.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
