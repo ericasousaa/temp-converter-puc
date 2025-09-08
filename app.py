@@ -15,8 +15,10 @@ def main():
     c = f_to_c(f)
     print(f"{f}°F = {c:.2f}°C")
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     main()
     import time
     while True:
         time.sleep(60)
+
+#aaaaaaaaSteste
