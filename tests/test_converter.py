@@ -1,4 +1,8 @@
+import sys, os
 import pytest
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 from app import f_to_c
 
 def test_freezing_point():
